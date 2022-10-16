@@ -1,35 +1,88 @@
-import numpy
-import tensoflow.keras as tf
-from tf.models import load_model
-from PIL import Image, ImageOps
-import numpy as np
+import random
+import time
+random.seed(time.process_time())
+#k1, k2, k3, k4
+k1 = random.randint(60, 100)
+k2 = random.randint(60, 100)
+k3 = random.randint(60, 100)
+k4 = random.randint(60, 100)
+Plist = [k1, k2, k3, k4]
+Nlist = ["PT", "PC", "PA", "PU"]
 
-# Load the model
-model = load_model('keras_model.h5')
+Maxi = 0
+Maxper = 0
+for x in range(1, 4):
+    Pe = Plist[x]
+    if x == 1 or Pe > Maxper:
+        Maxper = Pe
+        Maxi = x
 
-# Create the array of the right shape to feed into the keras model
-# The 'length' or number of images you can put into the array is
-# determined by the first position in the shape tuple, in this case 1.
-data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-# Replace this with the path to your image
-image = Image.open('<IMAGE_PATH>').convert('RGB')
-#resize the image to a 224x224 with the same strategy as in TM2:
-#resizing the image to be at least 224x224 and then cropping from the center
-size = (224, 224)
-image = ImageOps.fit(image, size, Image.ANTIALIAS)
+name = Nlist[Maxi]
 
-#turn the image into a numpy array
-image_array = np.asarray(image)
-# Normalize the image
-normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-# Load the image into the array
-data[0] = normalized_image_array
+print(name)
 
-# run the inference
-prediction = model.predict(data)
-index = np.argmax(prediction)
-class_name = class_names[index]
-confidence_score = prediction[0][index]
+import tkinter
+from tkinter import *
 
-print("Class: ", class_name)
-print("Confidence Score: ", confidence_score)
+window = Tk()
+window.title("UltrasonidoALi")
+window.geometry("500x500")
+
+canvas = Canvas(window, width= 400, height= 500, bg="SpringGreen2")
+#canvas.place(x=100, y=0)
+
+#Add a text in Canvas
+textcanvas = Frame(window, width= 100, height= 10, bg="White")
+region_text = tkinter.Label(textcanvas, width=20, height=1, text="TICK TESTING...", bg="white", font=('Helvetica 15 bold'))
+region_text.pack()
+textcanvas.pack()
+
+size = 400
+px = 0
+py = 150-size/2
+usrange = 70
+fixedstart = 180+usrange/2
+fixedextent = usrange+usrange/2
+coord = px, py, px+size, py+size
+arc = canvas.create_arc(coord, start=fixedstart, extent=fixedextent, fill="white")
+
+canvas.pack(side="right")
+
+credit = 0
+def add(amount, name):
+    global credit
+    credit += amount
+    region_text.configure(text=name)
+
+
+
+menucanvas = Canvas(window, width= 100, height= 500, bg="SpringGreen2")
+for x in range(0,4):
+    name = Nlist[x]
+    #Button(window, text=name, command=lambda: add(.1)).grid(row=2+x, column=1)
+
+    def customfunction():
+        add(.1, name)
+        region_text.pack()
+
+    button = tkinter.Button(menucanvas, text=name, command=customfunction,height=1, width=20)
+    button.pack()
+
+
+
+
+menucanvas.pack(side="left")
+tkinter.Misc.lift(canvas)
+
+
+
+"""
+print("*******STARTING********")
+m = 100
+for x in range(1, m):
+    print("tick")
+
+print("*******ENDING********")
+"""
+
+window.mainloop()
